@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
-# Configure Nginx so that its HTTP response contains a custom header
-# The name of the custom HTTP header must be `X-Served-By`
-# The value of the custom HTTP header must be the `hostname` of the server Nginx is running on
+# Installs HAproxy 2.0, uses roundrobin algorithm, managed via init script
 
-sudo apt-get update
-sudo apt-get -y install nginx
-sudo ufw enable
-sudo ufw allow 'Nginx HTTP'
-echo 'Hello World!' |sudo tee /var/www/html/index.html
+apt-get sudo  install software-properties-common -y
+add-apt-repository ppa:vbernat/haproxy-2.0 -y
+apt-get update -y
+apt-get install haproxy=2.0.\* -y
+# Copies default config just in case :)
+sudo cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.orig
 
-custom_header="server_name _;\n\tadd_header X-Served-By \$HOSTNAME;"
-sudo sed -i "s|server_name _;|$custom_header|" /etc/nginx/sites-enabled/default
-sudo service nginx restart
+echo "ENABLED=1" >> /etc/default/haproxy
+sudo sed -i "$ a $frontend_setup" /etc/haproxy/haproxy.cfg
+sudo sed -i "$ a $backend_setup" /etc/haproxy/haproxy.cfg
+
+sudo service haproxy restart
