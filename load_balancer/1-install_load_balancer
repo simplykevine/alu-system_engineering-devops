@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
-# Installs HAproxy 2.0, uses roundrobin algorithm, managed via init script
+#Bash script that installs HAProxy & makes configurations
 
-apt-get sudo  install software-properties-common -y
-add-apt-repository ppa:vbernat/haproxy-2.0 -y
-apt-get update -y
-apt-get install haproxy=2.0.\* -y
-# Copies default config just in case :)
-sudo cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.orig
-
+apt-get -y install software-properties-common
+add-apt-repository ppa:vbernat/haproxy-1.8
+apt-get update
+apt-get -y install haproxy
 echo "ENABLED=1" >> /etc/default/haproxy
-sudo sed -i "$ a $frontend_setup" /etc/haproxy/haproxy.cfg
-sudo sed -i "$ a $backend_setup" /etc/haproxy/haproxy.cfg
-
+printf %s "listen 6052-webs
+    bind *:80
+    mode http
+    balance roundrobin
+    server 5968-web-02 54.160.195.4:80 check
+    server 5968-web-01 100.26.42.34:80 check
+" >> /etc/haproxy/haproxy.cfg
 sudo service haproxy restart
