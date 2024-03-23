@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# make Me Lough bingo
-sudo rm /etc/nginx/sites-enabled/default
-sudo ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
-sudo service nginx stop
+# comment
+ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+service nginx restart
+kill "$(pgrep 'nginx' | head -1)"
